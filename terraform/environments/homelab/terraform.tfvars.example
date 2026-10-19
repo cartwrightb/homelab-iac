@@ -1,0 +1,16 @@
+# NON-RUNNABLE example. Copy outside the checkout and replace all placeholders.
+# No credentials here. Values and IDs are deliberately not guessed.
+node_name                   = "REPLACE_NODE"
+pool_id                     = "REPLACE_DISPOSABLE_POOL"
+vm_id                       = 0
+template_vm_id              = 0
+template_contract_confirmed = false
+datastore_id                = "REPLACE_STORAGE"
+cpu_type                    = "REPLACE_VERIFIED_CPU_MODEL"
+bridge                      = "REPLACE_TEST_BRIDGE"
+vlan_id                     = null
+ipv4_address                = "REPLACE_RESERVED_IPV4_CIDR"
+ipv4_gateway                = "REPLACE_GATEWAY"
+dns_servers                 = ["REPLACE_DNS"]
+automation_user             = "REPLACE_AUTOMATION_USER"
+ssh_public_key              = "REPLACE_ED25519_PUBLIC_KEY"

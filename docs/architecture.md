@@ -7,7 +7,8 @@ builds, provisioning and guest configuration. Kubernetes resources and
 workloads are managed in the separate `homelab-platform` repository using
 FluxCD.
 
-This document describes intent, not a deployed or tested system. No live
+The [first milestone](milestone-disposable-vm.md) adds prepared configurations,
+not a deployed or tested system. No live
 environment or `homelab-platform` configuration has been inspected for this
 foundation work.
 
@@ -34,13 +35,13 @@ before a concrete workflow demonstrates the need.
 
 ## Repository organization
 
-Start with documentation. Add tool directories as implementation begins:
+The first implementation introduces:
 
 - `terraform/environments/homelab/`: one initial root configuration and state
-  boundary, subject to the agreed resource scope.
-- `packer/`: image definitions and the minimal supporting scripts they need.
+  boundary owning only one disposable guest, excluding build01/template.
 - `ansible/`: playbooks and sanitized example inventory; roles when justified.
-- `.github/workflows/`: static checks once there are meaningful inputs to check.
+- Packer and `.github/workflows/` remain deferred until their workflows/toolchain
+  can be introduced and validated with a concrete need.
 
 Avoid introducing shared modules or multiple Terraform state boundaries until
 reuse, lifecycle differences or risk justify the extra coordination.
@@ -64,3 +65,9 @@ Before live provisioning, agree:
 
 Before implementation, inspect relevant existing configuration and document
 consequential choices using [decision records](decisions/README.md).
+
+For this milestone, the controller is manually created, Terraform and Ansible
+run separately, Packer is deferred and local state stays outside the repository.
+See ADRs 0001-0003 for accepted boundaries and the provisional provider choice.
+Remaining private values and compatibility evidence are in the milestone guide;
+these decisions do not resolve Kubernetes/Flux bootstrap ownership.

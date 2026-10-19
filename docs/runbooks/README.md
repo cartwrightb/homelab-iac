@@ -1,7 +1,13 @@
 # Operational runbooks
 
-Add runbooks when real operational workflows are introduced. No provisioning,
-maintenance or recovery procedure has been implemented or tested yet.
+The first milestone introduces these prepared, **untested** procedures:
+
+- [Fedora controller and template bootstrap](fedora-bootstrap.md)
+- [Private local state backup/recovery](local-state.md)
+- [Disposable guest lifecycle](disposable-vm.md)
+
+Their presence does not authorize execution. Installation, credential use and
+live operations still require the applicable explicit approval.
 
 Each runbook should explain:
 

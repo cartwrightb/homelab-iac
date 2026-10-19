@@ -102,6 +102,38 @@ Check relative Markdown links and exercise ignore patterns with
 There is no automated test or CI suite yet. Whitespace checks and manual
 review cannot prove that files contain no sensitive information.
 
+### First milestone static validation
+
+With already approved/available tools, run from the repository root:
+
+```sh
+terraform fmt -check -recursive terraform
+```
+
+Provider-aware validation requires a separately approved Terraform/provider
+installation. Use an isolated private `TF_DATA_DIR` with no credentials and
+`terraform -chdir=terraform/environments/homelab init -backend=false`, then
+`terraform -chdir=terraform/environments/homelab validate`. This init downloads
+executable provider software. It must generate a genuine dependency lockfile;
+review it and include it in the eventual approved commit. Do not fabricate one.
+Do not reuse this validation data directory for live runs; initialize a separate
+one against the private backend. Never use `plan` as an offline validation check.
+
+From `ansible/`, after approved Ansible/lint availability, use only the sanitized
+example inventory for syntax validation (no credentialed inventory plugins):
+
+```sh
+ansible-playbook -i inventories/example/hosts.yml control-node.yml --syntax-check
+ansible-playbook -i inventories/example/hosts.yml disposable.yml --syntax-check
+ansible-lint control-node.yml disposable.yml
+```
+
+Run linters with network/offline behavior reviewed and configured as appropriate;
+dependency auto-install is not authorized implicitly. YAML parsing alone does
+not validate Ansible modules, Jinja expressions, privilege escalation or runtime
+behavior. Record unavailable checks explicitly; do not describe parsing as a
+passed Terraform/Ansible validation. See the [milestone status](milestone-disposable-vm.md).
+
 ## Future validation
 
 As tool configuration arrives, add appropriate formatting, validation and

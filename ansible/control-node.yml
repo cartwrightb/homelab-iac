@@ -1,0 +1,44 @@
+---
+- name: Maintain the manually bootstrapped Fedora build VM
+  hosts: build
+  gather_facts: false
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Require an explicit build target and execution acknowledgement
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname == 'build01'
+          - ansible_play_hosts_all | length == 1
+          - ansible_user is defined
+          - ansible_user != 'root'
+          - (build_configuration_confirmed | default(false)) | bool
+          - expected_machine_id is defined
+          - expected_machine_id is match('^[0-9a-f]{32}$')
+        fail_msg: Confirm the approved build01 target in private variables before execution.
+    - name: Read build VM machine identity
+      ansible.builtin.command: cat /etc/machine-id
+      register: machine_identity
+      changed_when: false
+      check_mode: false
+    - name: Verify console-approved build VM identity
+      ansible.builtin.assert:
+        that:
+          - machine_identity.stdout | trim == expected_machine_id
+    - name: Gather build VM facts
+      ansible.builtin.setup:
+    - name: Require Fedora
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == 'Fedora'
+  tasks:
+    - name: Install baseline control-node packages
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - git
+          - python3
+          - openssh-clients
+        state: present
+    - name: Explain separately approved tool installation
+      ansible.builtin.debug:
+        msg: Terraform, Ansible and lint tool versions/install sources require the bootstrap runbook decisions.
