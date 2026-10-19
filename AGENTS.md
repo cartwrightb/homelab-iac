@@ -28,6 +28,37 @@ developing Platform Engineering, SRE and AI-assisted development practices.
 - Explain engineering reasoning at a level useful to an experienced
   infrastructure engineer learning these tools and practices.
 
+## Multi-agent workflow
+
+- The main agent owns scope, planning, implementation, validation and synthesis.
+  Keep file and Git edits with the main agent. Subagents share the workspace.
+- Automatically delegate significant engineering changes to `reviewer` after
+  implementation and appropriate local checks, including policy changes affecting
+  engineering or security boundaries. No manual handoff or separate delegation
+  approval is required within the approved task scope. Preserve the routine-edit
+  and routine-documentation proportionate-check exceptions above.
+- Invoke `mentor` for consequential technical decisions, during design or after
+  implementation stabilizes, not routine edits. Mentor explains alternatives and
+  concepts; it replaces neither the main agent's rationale nor independent review.
+- Give Reviewer the complete intended change, relevant context, requirements and
+  validation evidence. Require independent inspection, prioritized findings with
+  file references, challenged assumptions and remaining validation limits.
+- Resolve findings in the main agent. Request focused re-review when fixes
+  materially affect reviewed behavior. Do not integrate significant changes
+  without independent review; report unresolved findings and implications.
+- Use the project roles in `.codex/agents/`. If named-role selection is unavailable,
+  disclose that limitation and use a separate generic subagent with the exact role
+  instructions. This does not validate named-role discovery. If delegation fails
+  entirely, report it and leave required independent review outstanding.
+- Report each subagent's role, actual identifier, assignment, completion status,
+  findings or explanation, and any failure or fallback. Distinguish actual tool
+  invocation from planned delegation and verified behavior from assumptions.
+- Internal handoffs and review/fix cycles do not expand authorization. All agents
+  preserve the approval gates below, including credential use and live validation.
+  Reviewer is an engineering role, not Codex's automatic permission reviewer.
+  Read-only role instructions do not create a separate sandbox: subagents inherit
+  parent permissions. Neither role may approve actions or delegate further.
+
 ## Working approach
 
 - Prefer straightforward configurations and incremental improvements.
