@@ -9,9 +9,11 @@ Platform Engineering, SRE practices and AI-assisted development.
 
 ## Current status
 
-This repository currently contains documentation and repository safeguards.
-There are no infrastructure configurations, automated checks or tested
-provisioning workflows yet.
+The first practical milestone has prepared Terraform and Ansible configurations
+for a manually bootstrapped Fedora controller and one disposable Proxmox guest.
+The workflow is not live-tested. Provider compatibility, tool installation,
+dependency locking and private environment prerequisites remain outstanding.
+See the [milestone guide](docs/milestone-disposable-vm.md) before using any commands.
 
 ## Intended architecture
 
@@ -33,10 +35,11 @@ ownership remain open decisions. See [architecture](docs/architecture.md).
 | `AGENTS.md` | Engineering, learning, review and authorization rules |
 | `.gitignore` | Safeguards for local configuration, secrets and generated files |
 | `docs/` | Architecture, development, security, decisions and runbook guidance |
+| `terraform/environments/homelab/` | One disposable guest root; provisional provider pin and private local state |
+| `ansible/` | Separate control-node baseline and disposable guest playbooks; placeholder inventory |
 
-Introduce `terraform/`, `packer/`, `ansible/` and `.github/workflows/` only
-when actual implementation requires them. Add modules and roles when a
-concrete need for them emerges.
+Packer, shared modules/roles and CI workflows remain deferred. Add them when a
+concrete need and validated toolchain justify them.
 
 ## Development workflow
 
@@ -57,8 +60,10 @@ Keep credentials, sensitive infrastructure details, real inventories,
 Terraform state and saved plans out of this public repository. Use sanitized
 examples. Ignore rules are a safeguard, not a substitute for reviewing files.
 
-State storage, locking and credential delivery must be agreed before live
-provisioning. See [security](docs/security.md).
+The first experiment uses one private local state outside the checkout, with
+OS locking and a mandatory encrypted off-VM backup/recovery procedure. Exact
+paths, credentials and recovery custody must be agreed before live provisioning.
+See [security](docs/security.md) and the [state runbook](docs/runbooks/local-state.md).
 
 ## Documentation
 
@@ -70,7 +75,8 @@ provisioning. See [security](docs/security.md).
 
 ## Next milestones
 
-1. Inspect the existing platform workflow and agree ownership boundaries.
-2. Agree state storage, credential delivery and a sanitized configuration model.
-3. Introduce one small implementation increment with appropriate static checks.
-4. Validate against live infrastructure only after explicit approval.
+1. Resolve the [milestone prerequisites](docs/milestone-disposable-vm.md), authorize
+   tooling installation and complete native static validation/dependency locking.
+2. Bootstrap build01 and a new source template only after live approval.
+3. Validate the disposable lifecycle in separately approved stages.
+4. Inspect the existing platform workflow before future Kubernetes integration.

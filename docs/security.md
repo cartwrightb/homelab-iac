@@ -34,8 +34,19 @@ backup and recovery, and credential delivery. State and saved plans can
 contain sensitive values even when terminal output marks them sensitive.
 Do not put credentials in backend configuration committed to Git.
 
-No backend or secret-management product has been selected. This foundation
-does not establish encryption, access control or recovery for private data.
+The first disposable milestone selects a single-runner local backend, outside
+the checkout; see [ADR 0003](decisions/0003-private-local-state.md) and the
+[backup/recovery runbook](runbooks/local-state.md). Encryption, exact private
+paths, backup destination/retention and recovery-key custody remain prerequisites,
+not implemented storage controls. No secret-management product has been selected.
+
+Use a dedicated PVE API identity/token and separate Linux automation account/SSH
+keys. No Proxmox node SSH or sudo is configured. Guest sudo must be explicitly
+reviewed: password-prompted administrative sudo is still root-equivalent, and
+cloud-init may supply passwordless rules. The playbooks do not silently grant or
+restrict those privileges. Keep API tokens out of Terraform input variables;
+use private environment injection and disable debug/trace logs. Terraform outputs
+marked sensitive still require private handling.
 
 ## CI trust boundary
 

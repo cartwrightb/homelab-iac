@@ -1,0 +1,3 @@
+# Copy outside the checkout; replace both values. Use only the default workspace.
+path          = "/REPLACE_WITH_PRIVATE_STATE_DIRECTORY/disposable.tfstate"
+workspace_dir = "/REPLACE_WITH_PRIVATE_STATE_DIRECTORY/workspaces"

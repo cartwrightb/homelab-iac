@@ -1,0 +1,114 @@
+---
+- name: Configure only the disposable Fedora guest
+  hosts: disposable
+  gather_facts: false
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Require one explicitly confirmed disposable target
+      ansible.builtin.assert:
+        that:
+          - ansible_play_hosts_all | length == 1
+          - inventory_hostname == 'iac-disposable-01'
+          - ansible_user is defined
+          - ansible_user != 'root'
+          - (disposable_configuration_confirmed | default(false)) | bool
+          - expected_machine_id is defined
+          - expected_machine_id is match('^[0-9a-f]{32}$')
+        fail_msg: Verify the private inventory and console machine identity before execution.
+    - name: Wait for SSH and Python
+      ansible.builtin.wait_for_connection:
+        timeout: 180
+    - name: Read machine identity before guest changes
+      ansible.builtin.command: cat /etc/machine-id
+      register: machine_identity
+      changed_when: false
+      check_mode: false
+    - name: Verify console-approved guest identity
+      ansible.builtin.assert:
+        that:
+          - machine_identity.stdout | trim == expected_machine_id
+    - name: Wait for first-boot configuration to finish
+      become: true
+      ansible.builtin.command: cloud-init status --wait
+      async: 600
+      poll: 5
+      changed_when: false
+      when: not ansible_check_mode
+    - name: Gather guest facts
+      ansible.builtin.setup:
+    - name: Require Fedora with enforcing SELinux
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == 'Fedora'
+          - ansible_facts.selinux.status == 'enabled'
+          - ansible_facts.selinux.mode == 'enforcing'
+    - name: Gather service state
+      ansible.builtin.service_facts:
+    - name: Require the template firewall to be running
+      ansible.builtin.assert:
+        that:
+          - "'firewalld.service' in ansible_facts.services"
+          - ansible_facts.services['firewalld.service'].state == 'running'
+  tasks:
+    - name: Install demonstration web service
+      become: true
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+    - name: Configure a loopback-only demonstration service
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: '0644'
+        validate: /usr/sbin/nginx -t -c %s
+        content: |
+          user nginx;
+          worker_processes auto;
+          error_log /var/log/nginx/error.log;
+          pid /run/nginx.pid;
+          events { worker_connections 128; }
+          http {
+              server {
+                  listen 127.0.0.1:80;
+                  server_name localhost;
+                  root /usr/share/nginx/html;
+                  location / { try_files $uri $uri/ =404; }
+              }
+          }
+      notify: Restart nginx
+    - name: Publish demonstration page
+      become: true
+      ansible.builtin.copy:
+        dest: /usr/share/nginx/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+        content: "homelab-iac disposable guest configured by Ansible\n"
+    - name: Enable demonstration service
+      become: true
+      ansible.builtin.systemd_service:
+        name: nginx
+        enabled: true
+        state: started
+    - name: Apply pending service configuration
+      ansible.builtin.meta: flush_handlers
+    - name: Verify the local demonstration response
+      ansible.builtin.uri:
+        url: http://127.0.0.1/
+        return_content: true
+        use_proxy: false
+      register: demo_response
+      when: not ansible_check_mode
+    - name: Verify demonstration content
+      ansible.builtin.assert:
+        that:
+          - "'homelab-iac disposable guest configured by Ansible' in demo_response.content"
+      when: not ansible_check_mode
+  handlers:
+    - name: Restart nginx
+      become: true
+      ansible.builtin.systemd_service:
+        name: nginx
+        state: restarted
