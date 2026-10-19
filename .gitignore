@@ -1,0 +1,49 @@
+# Local private configuration. Keep sanitized examples outside these paths.
+.env
+.env.*
+!.env.example
+.local/
+**/inventories/private/
+
+# Terraform working data, state, saved plans and real input values.
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+*.tfvars
+*.tfvars.json
+*.tfbackend
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+# Keep root .terraform.lock.hcl files tracked for reproducible dependencies.
+
+# Packer local inputs and build output.
+*.pkrvars.hcl
+*.pkrvars.json
+packer_cache/
+output-*/
+
+# Ansible execution artifacts.
+*.retry
+
+# Credentials and private key material; this is not exhaustive secret detection.
+.aws/
+.kube/
+.ssh/
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Local OS and editor artifacts.
+.DS_Store
+*.swp
+*.swo
+*~
